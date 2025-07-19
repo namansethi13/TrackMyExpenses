@@ -1,4 +1,4 @@
-# TrackMyExpenses is your day to day expense tracker powered with AI 🤖
+# TrackMyExpenses is your day-to-day expense tracker powered by AI 🤖
 
 ### 🚧 Still building it, but hey Rome wasn’t built in a day.
 
