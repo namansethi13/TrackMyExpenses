@@ -44,6 +44,12 @@ export default function App() {
   const onSideBarToggle = () => {
     setSidebarOpen(prev => !prev)
   }
+
+  const closeSidebarWenClickedOutside = () => {
+    if(smallScreen && sidebarOpen) {
+      setSidebarOpen(false)
+    }
+  }
   return (
     <div className="flex w-full h-full">
       <div className={`transition-all ease-in-out duration-300 ${sidebarOpen ? 'w-64' : 'w-0'} ${smallScreen ? "absolute" : ""}`}>
@@ -54,7 +60,7 @@ export default function App() {
           onSideBarToggle={onSideBarToggle}
         />
       </div>
-    <div className="flex-1 overflow-auto p-4">
+    <div className="flex-1 overflow-auto p-4" onClick={closeSidebarWenClickedOutside} onTouchStart={closeSidebarWenClickedOutside} >
     {
       selectedKey === "dashboard" ? <Dashboard />
       : selectedKey === "expense" ? <AddExpense />

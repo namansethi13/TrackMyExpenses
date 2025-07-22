@@ -32,7 +32,7 @@ export function AppSidebar({onItemSelect, navItems, onSideBarToggle, sidebarOpen
 
 
   return (
-    <div className={`h-screen w-64 duration-300 bg-gray-100 dark:bg-gray-900 p-4 shadow-md flex relative flex-col justify-between transition-all ${sidebarOpen ? "" : "-translate-x-full" } ease-in-out`}>
+    <div className={`h-screen fixed z-50 w-64 duration-300 bg-gray-100 dark:bg-gray-900 p-4 shadow-md flex flex-col justify-between transition-all ${sidebarOpen ? "" : "-translate-x-full" } ease-in-out`}>
       <div id="logo-container" className="flex gap-2 justify-center items-center">
         <ReceiptIndianRupee/>
         <h2 className="text-lg font-bold text-gray-800 dark:text-white">TrackMyExpenses</h2>

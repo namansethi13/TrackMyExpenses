@@ -28,25 +28,21 @@ export default function Dashboard(){
                 <ExpenseSummaryDatePicker />
                 <button className="mt-4 p-2 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600 transition">Generate Report</button>
                 <ExpenseSummaryTable
-                    tableData={{
-                        header: ["Category", "Total Amount"],
-                        rows: [
-                            ["Groceries", "10"],
-                            ["Utilities", "20"],
-                            ["Rent", "30"],
-                        ],
-                        subrows: [[
-                            ["June 6th", ""],
-                            ["June 6th", ""],
-                            ],
-                            [
-                            ["June 7th", ""],
-                            ],
-                        ]
-                    }}
                     rowsDropdown={true}
-                />
-                <h3 className="text-lg font-bold md:text-left mt-12">Ai Suggestions</h3>
+                    tableData={{
+                        header: ["Category", "Amount"],
+                        rows: [
+                        ["Groceries", "$100"],
+                        ["Rent", "$500"],
+                        ["Utilities", "$200"]
+                        ],
+                        subrows: [
+                        [ ["June 1", "$50"], ["June 5", "$50"] ],
+                        [ ["Paid on June 3", "$500"] ],
+                        [ ["Electricity", "$150"], ["Water", "$50"] ]
+                        ]
+                    }}/>
+                        <h3 className="text-lg font-bold md:text-left mt-12">Ai Suggestions</h3>
                 <div className="mt-4 p-4 bg-gray-100 rounded-lg">
                     <p className="text-gray-700">No suggestions available at the moment.</p>
                 </div>
