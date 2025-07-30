@@ -1,7 +1,8 @@
 import {AppSidebar} from "@/components/AppSidebar";
 import { Home, Plus, ChartLineIcon, MessageSquareIcon } from "lucide-react";
 import { useState, useEffect } from "react";
-import { AddExpense, ChatWithAI, Dashboard, Visualize, Fallback } from "./components/home-screens";
+import {ChatWithAI, Dashboard, Visualize, Fallback } from "./components/home-screens";
+import ManageMoney from "./components/home-screens/ManageMoney";
 
 type NavItem = {
   name: string;
@@ -15,7 +16,7 @@ export default function App() {
 
     const navItems : NavItem[] = [
       { name: "Dashboard", icon: <Home />, key: "dashboard" },
-      { name: "Add New Expense", icon: <Plus />, key: "expense" },
+      { name: "Manage Money", icon: <Plus />, key: "manage" },
       { name: "Visualize", icon: <ChartLineIcon />, key: "chart" },
       { name: "Chat with ai", icon: <MessageSquareIcon />, key: "chat" },
     ];
@@ -63,7 +64,7 @@ export default function App() {
     <div className="flex-1 overflow-auto p-4" onClick={closeSidebarWenClickedOutside} onTouchStart={closeSidebarWenClickedOutside} >
     {
       selectedKey === "dashboard" ? <Dashboard />
-      : selectedKey === "expense" ? <AddExpense />
+      : selectedKey === "manage" ? <ManageMoney />
       : selectedKey === "settings" ? <ChatWithAI />
       : selectedKey === "chart" ? <Visualize />
       : selectedKey === "chat" ? <ChatWithAI />
