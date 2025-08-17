@@ -1,3 +1,5 @@
+import { auth } from "@/firebase";
+import { signOut } from "firebase/auth";
 import { ReceiptIndianRupee,LogOut, ChevronLeft, ChevronRight} from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -30,6 +32,9 @@ export function AppSidebar({onItemSelect, navItems, onSideBarToggle, sidebarOpen
     onItemSelect(selectedOption);
   }, [selectedOption, onItemSelect]);
 
+  const handleLogout = () => {
+    signOut(auth)
+  }
 
   return (
     <div className={`h-screen fixed z-50 w-64 duration-300 bg-gray-100 dark:bg-gray-900 p-4 shadow-md flex flex-col justify-between transition-all ${sidebarOpen ? "" : "-translate-x-full" } ease-in-out`}>
@@ -57,7 +62,10 @@ export function AppSidebar({onItemSelect, navItems, onSideBarToggle, sidebarOpen
           })}
         </ul>
 
-        <div id="logout-button" className="flex gap-2 justify-start items-center p-2 transition-all rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700">
+        <div id="logout-button" 
+        className="flex gap-2 justify-start items-center p-2 transition-all rounded-lg cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+        onClick={handleLogout}
+        >
             <LogOut/>
             <h3>Logout</h3>
         </div>
