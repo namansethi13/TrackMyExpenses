@@ -1,0 +1,26 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: DockerFile
+    ports:
+      - "5173:5173"
+    entrypoint: ["./entrypoint.sh"]
+    env_file:
+      - ./frontend/.env
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules 
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+  backend:
+    build:
+      context: ./backend
+      dockerfile: DockerFile
+    ports:
+      - "8000:8000"
+    entrypoint: ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --reload"]
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app

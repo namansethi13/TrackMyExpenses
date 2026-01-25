@@ -5,7 +5,6 @@ import {
   signInWithPhoneNumber,
 } from "firebase/auth";
 
-// Type-safe Firebase config
 const firebaseConfig: {
   apiKey: string;
   authDomain: string;
@@ -22,7 +21,7 @@ const firebaseConfig: {
   appId: import.meta.env.VITE_FIREBASE_APP_ID as string,
 };
 
-const app = initializeApp(firebaseConfig);
-const auth: any = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const auth: any = getAuth(app);
 
 export { auth, RecaptchaVerifier, signInWithPhoneNumber };
