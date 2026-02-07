@@ -24,3 +24,31 @@ services:
       - ./backend/.env
     volumes:
       - ./backend:/app
+  celery:
+    build:
+      context: ./backend
+      dockerfile: DockerFile
+    entrypoint: ["sh", "-c", "celery -A main worker --loglevel=info"]
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: DockerFile
+    entrypoint: ["sh", "-c", "celery -A main beat --loglevel=info"]
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+
+volumes:
+  mongo-data:
