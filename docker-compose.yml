@@ -28,7 +28,7 @@ services:
     build:
       context: ./backend
       dockerfile: DockerFile
-    entrypoint: ["sh", "-c", "celery -A main worker --loglevel=info"]
+    entrypoint: ["sh", "-c", "celery -A cel.app.celery_app worker -l info"]
     env_file:
       - ./backend/.env
     volumes:
@@ -37,7 +37,7 @@ services:
     build:
       context: ./backend
       dockerfile: DockerFile
-    entrypoint: ["sh", "-c", "celery -A main beat --loglevel=info"]
+    entrypoint: ["sh", "-c", "celery -A cel.app.celery_app beat -l info"]
     env_file:
       - ./backend/.env
     volumes:
@@ -48,6 +48,10 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
 
 
 volumes:
