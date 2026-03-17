@@ -1,9 +1,12 @@
+import os
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from middleware.auth import AuthMiddleware
 from routers.routes import router
 from core.logger import get_logger
-from contextlib import asynccontextmanager
-import os
 
 logger = get_logger(__name__)
 
@@ -12,43 +15,15 @@ logger = get_logger(__name__)
 async def lifespan(app: FastAPI):
     logger.info("Starting application")
     try:
-        from core.database import connect_to_db
+        from core.database import init_db, connect_to_db
+        init_db()
         connect_to_db()
         logger.info("Connected to database")
     except Exception:
         logger.exception("Failed to connect to database")
     
-    # Set up Telegram webhook for local development if dev mode is enabled
-    dev_mode = os.getenv("DEV", "0") == "1"
-    if dev_mode:
-        logger.info("Dev mode enabled. Setting up Telegram webhook...")
-        try:
-            from dev_util_scripts.localhost_webhook_to_tg import LocalhostWebhookManager
-            
-            bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
-            if bot_token:
-                webhook_manager = LocalhostWebhookManager(local_port=8000)
-                success = webhook_manager.setup_telegram_webhook(bot_token)
-                if success:
-                    app.state.webhook_manager = webhook_manager
-                    logger.info("Telegram webhook setup completed")
-                else:
-                    logger.warning("Failed to set up Telegram webhook")
-            else:
-                logger.warning("TELEGRAM_BOT_TOKEN not set, skipping webhook setup")
-        except Exception as e:
-            logger.warning(f"Error setting up Telegram webhook: {e}")
-    
     yield
     logger.info("Shutting down application")
-    
-    # Cleanup webhook manager if it exists
-    if dev_mode and hasattr(app.state, "webhook_manager"):
-        try:
-            app.state.webhook_manager.cleanup()
-        except Exception as e:
-            logger.error(f"Error cleaning up webhook manager: {e}")
-    
     try:
         from core.database import close_db_connection
         close_db_connection()
@@ -58,6 +33,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+_cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.add_middleware(AuthMiddleware)
 app.include_router(router)
 

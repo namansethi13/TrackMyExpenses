@@ -4,6 +4,7 @@ Telegram chat interface module.
 Converts incoming Telegram webhook payloads into IncomingChatEvent.
 """
 
+import os
 from uuid import uuid4
 from typing import Optional
 import requests
@@ -25,8 +26,11 @@ class ChatInterfaceError(Exception):
 
 
 class TelegramInterface(BaseChatInterface):
-    
+
     TELEGRAM_API_URL = "https://api.telegram.org"
+
+    def __init__(self, bot_token: Optional[str] = None):
+        self.bot_token = bot_token or os.getenv("TELEGRAM_BOT_TOKEN")
 
     def to_incoming_event(self, payload: TelegramUpdate) -> Optional[IncomingChatEvent]:
         """
@@ -71,23 +75,49 @@ class TelegramInterface(BaseChatInterface):
             )
         return True
 
-    def setWebhook(self, bot_token: str, webhook_url: str) -> bool:
+    def send_message(self, chat_id: int, text: str) -> bool:
+        """
+        Send a message to a Telegram chat.
+
+        Args:
+            chat_id (int): The Telegram chat ID to send the message to
+            text (str): The message text
+
+        Returns:
+            bool: True if message was sent successfully
+
+        Raises:
+            ChatInterfaceError: If the API call fails
+        """
+        try:
+            api_url = f"{self.TELEGRAM_API_URL}/bot{self.bot_token}/sendMessage"
+            response = requests.post(api_url, json={"chat_id": chat_id, "text": text}, timeout=10)
+            response.raise_for_status()
+            self._validate_response(response.json())
+            return True
+        except ChatInterfaceError:
+            raise
+        except requests.exceptions.RequestException as e:
+            raise ChatInterfaceError(f"Failed to send Telegram message: {e}") from e
+        except Exception as e:
+            raise ChatInterfaceError(f"Unexpected error sending Telegram message: {e}") from e
+
+    def setWebhook(self, webhook_url: str) -> bool:
         """
         Set the Telegram bot webhook URL.
-        
+
         Args:
-            bot_token (str): The Telegram bot token
             webhook_url (str): The public webhook URL where Telegram should send updates
-        
+
         Returns:
             bool: True if webhook was set successfully, False otherwise
-        
+
         Raises:
             ChatInterfaceError: If API validation fails
         """
         try:
             # Build the API endpoint URL
-            api_url = f"{self.TELEGRAM_API_URL}/bot{bot_token}/setWebhook"
+            api_url = f"{self.TELEGRAM_API_URL}/bot{self.bot_token}/setWebhook"
             
             payload = {
                 "url": webhook_url,

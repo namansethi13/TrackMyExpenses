@@ -77,8 +77,7 @@ export default function PhoneLogin() {
 
     try {
       await confirmationResult.confirm(verificationCode)
-      setMessage("Phone number verified!")
-      alert("Login successful!")
+      // AuthContext onAuthStateChanged fires here → exchanges token → redirects automatically
     } catch (err) {
       console.error(err)
       setError("Invalid verification code. Please try again.")

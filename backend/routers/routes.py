@@ -1,14 +1,24 @@
-from fastapi import APIRouter, Request, Response
-from controllers.types.telegram_models import TelegramUpdate 
+from fastapi import APIRouter, HTTPException, Request, Response
 
+from controllers.auth_controller import AuthController
+from controllers.types.auth_models import ExchangeRequest, TokenResponse
+from controllers.types.telegram_models import TelegramUpdate
 from controllers.incoming_chat_controllers import IncomingChatController
 from chat_interfaces.telegram import TelegramInterface
-from constants.routes_contants import TELEGRAM_WEBHOOK
+from constants.routes_contants import AUTH_EXCHANGE, TELEGRAM_WEBHOOK
 from core.logger import get_logger
 
 logger = get_logger(__name__)
 
 router = APIRouter()
+
+
+@router.post(AUTH_EXCHANGE, response_model=TokenResponse)
+async def auth_exchange(body: ExchangeRequest):
+    try:
+        return AuthController().exchange_token(body)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or expired Firebase token")
 
 
 
@@ -32,8 +42,8 @@ async def telegram_webhook_handler(request: Request):
         return Response(status_code=200)
 
     logger.info("Receiving telegram update: chat=%s, message_id=%s",
-                getattr(update.message, "chat", {}).get("id", "<unknown>"),
-                getattr(update.message, "message_id", "<unknown>"))
+                update.message.chat.id,
+                update.message.message_id)
 
     incoming_chat_controller.handle_telegram_update(
         telegram_interface=telegram_interface,

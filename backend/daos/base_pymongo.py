@@ -1,5 +1,6 @@
 from typing import Generic, TypeVar, Optional
 from bson import ObjectId
+from pymongo import ReturnDocument
 
 T = TypeVar('T')
 
@@ -30,6 +31,28 @@ class BasePyMongoDAO(Generic[T]):
         document = self.normalize_id(document)
         return self.generic_serialize(document) # type: ignore
     
+    def find_one(self, filter_query: dict) -> Optional[T]:
+        doc = self.collection.find_one(filter_query)
+        return self.serialize(doc) if doc else None
+
+    def find_one_and_upsert(
+        self,
+        filter_query: dict,
+        set_data: dict,
+        set_on_insert_data: dict,
+    ) -> T:
+        """
+        Upsert a document: $set fields on every write, $setOnInsert only on creation.
+        Returns the document after the operation.
+        """
+        doc = self.collection.find_one_and_update(
+            filter_query,
+            {"$set": set_data, "$setOnInsert": set_on_insert_data},
+            upsert=True,
+            return_document=ReturnDocument.AFTER,
+        )
+        return self.serialize(doc)
+
     def get_by_id(self, id_str: str) -> Optional[T]:
         obj_id = self.to_object_id(id_str)
         if not obj_id:

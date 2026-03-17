@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from enum import Enum
-from typing import Optional
+from typing import Any, Optional
 
 class ChatInterfaceType(str, Enum):
     TELEGRAM = "Telegram"
@@ -13,4 +13,4 @@ class IncomingChatEvent(BaseModel):
     timestamp: int = Field(..., description="Timestamp of when the message was received")
     user_external_id: str = Field(..., description="External identifier for the user in the chat interface")
     conversation_id : str = Field(..., description="Identifier for the conversation thread")
-    raw_payload: Optional[dict] = Field(None, description="Raw payload received from the chat interface")
+    raw_payload: Optional[Any] = Field(None, description="Raw payload received from the chat interface")

@@ -1,23 +1,27 @@
-from fastapi import FastAPI, Request
+from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-import firebase_admin
-from .firebase_config import default_app
-from firebase_admin import auth
+
+from auth.jwt_service import verify_access_token
+
+# Paths that do not require authentication
+UNAUTHENTICATED_PATHS = ["/webhooks/", "/auth/"]
+
 
 class AuthMiddleware(BaseHTTPMiddleware):
-    
-    async def dispatch(self, request : Request, call_next):
+
+    async def dispatch(self, request: Request, call_next):
+        if any(request.url.path.startswith(p) for p in UNAUTHENTICATED_PATHS):
+            return await call_next(request)
+
         header = request.headers.get("Authorization")
         if not header or not header.startswith("Bearer "):
             return JSONResponse(status_code=401, content={"message": "Unauthorized"})
-        id_token = header.split(" ")[1]
-        try:
-            decoded_token = auth.verify_id_token(id_token)
-            if decoded_token:
-                request.state.user = decoded_token
-            else:
-                return JSONResponse(status_code=401, content={"message": "Unauthorized"})
-        except Exception as e:
+
+        token = header.split(" ")[1]
+        payload = verify_access_token(token)
+        if not payload:
             return JSONResponse(status_code=401, content={"message": "Unauthorized"})
+
+        request.state.user = payload
         return await call_next(request)

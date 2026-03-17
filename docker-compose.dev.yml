@@ -20,7 +20,7 @@ services:
       dockerfile: DockerFile
     ports:
       - "8000:8000"
-    entrypoint: ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port 8000"]
+    entrypoint: ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --reload"]
     env_file:
       - ./backend/.env
     volumes:
@@ -28,6 +28,23 @@ services:
     depends_on:
       - mongodb
       - redis
+
+  # Runs dev-only startup scripts (ngrok tunnel, etc).
+  # To add a new startup concern: edit backend/scripts/dev/start.sh.
+  startup-scripts:
+    build:
+      context: ./backend
+      dockerfile: DockerFile
+    entrypoint: ["sh", "-c", "sed -i 's/\\r//' scripts/dev/start.sh && sh scripts/dev/start.sh"]
+    env_file:
+      - ./backend/.env
+    environment:
+      - BACKEND_HOST=backend
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - backend
+    restart: on-failure
 
   celery:
     build:

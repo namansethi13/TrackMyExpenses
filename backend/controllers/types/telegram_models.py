@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import Optional, Dict, Any
+from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class TelegramUser(BaseModel):
@@ -13,15 +13,13 @@ class TelegramChat(BaseModel):
 class TelegramMessage(BaseModel):
     message_id: int
     date: int
-    text: Optional[str]
-    from_: TelegramUser
+    text: Optional[str] = None
+    from_: TelegramUser = Field(alias="from")
     chat: TelegramChat
 
-    class Config:
-        fields = {
-            "from_": "from"
-        }
-    
+    model_config = {"populate_by_name": True}
+
+
 class TelegramUpdate(BaseModel):
     update_id: int
     message: Optional[TelegramMessage] = None

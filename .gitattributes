@@ -1,0 +1,4 @@
+* text=auto
+
+# Force LF for shell scripts — CRLF will break them inside Linux containers
+*.sh text eol=lf
